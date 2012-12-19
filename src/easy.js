@@ -3,10 +3,8 @@
  * Version 1.0
  * http://easy.cnodejs.net/
  */
-;
-(function(win, undefined) {
-	var
-	doc = win.document,
+;(function(win, undefined) {
+	var doc = win.document,
 		assets = {},
 		handlers = {},
 		queue = [],
@@ -18,13 +16,12 @@
 			if(obj instanceof api) return obj;
 			if(!(this instanceof api)) return new api(obj);
 		},
-		//静态变量
-		BASEURL = '',
 		//js模块路径
-		COMBOURL = '/combo?',
+		BASEURL = '',		
 		//合并api
-		DELIMITER = '&',
+		COMBOURL = '/combo?',
 		//合并分隔符
+		DELIMITER = '&',
 		//状态机
 		PRELOADING = 1,
 		PRELOADED = 2,
@@ -95,7 +92,7 @@
 				assets[item] = {
 					name: item,
 					state: LOADED
-				}
+				};
 			}
 		});
 		return api;
@@ -103,13 +100,12 @@
 
 	//工具函数
 
-
 	function has(obj, key) {
 		return {}.hasOwnProperty.call(obj, key);
 	}
 
 	function each(obj, iterator, context) {
-		if(obj == null) return;
+		if(obj === null) return;
 		if(nativeForEach && obj.forEach === nativeForEach) {
 			obj.forEach(iterator, context);
 		} else if(obj.length === +obj.length) {
@@ -139,7 +135,7 @@
 
 	function deepSlice(arr, num) {
 		var out = [];
-		for(i = num, len = arr.length; i < len; i++) {
+		for(var i = num, len = arr.length; i < len; i++) {
 			if(isArray(arr[i])) {
 				out[i - num] = deepSlice(arr[i], 0);
 			} else {
@@ -158,7 +154,7 @@
 				str = '"' + item + '",';
 			}
 		});
-		return str.slice(0, -1)
+		return str.slice(0, -1);
 	}
 
 	function one(callback) {
@@ -172,7 +168,6 @@
 
 	function noop() {}
 	//功能函数
-
 
 	function nameToPath(item) {
 		var path = item.split(':');
@@ -193,7 +188,8 @@
 	function getAsset(item) {
 		if(isArray(item)) {
 			var url = COMBOURL,
-				asset, temparr = deepSlice(item, 0),
+				asset,
+				temparr = deepSlice(item, 0),
 				itemStr = trim(temparr.join(''));
 			each(assets, function(_item) {
 				if(_item.tag == itemStr) {
@@ -207,7 +203,7 @@
 				if(isAdded(temparr[i])) {
 					temparr.splice(i, 1);
 				} else {
-					url += nameToPath(temparr[i]) + DELIMITER
+					url += nameToPath(temparr[i]) + DELIMITER;
 				}
 			}
 			if(temparr.length > 1) {
@@ -241,7 +237,6 @@
 	}
 
 	function ready(item, callback) {
-
 		callback = callback || noop;
 		var key = isAdded(item);
 		if(key && !handlers[key]) {
