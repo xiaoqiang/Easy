@@ -6,15 +6,24 @@ Easy.js
 API
 ===
 
-E.js('mod:a');
+E.js
+----
 
-加载http://baseurl/mod/a.js;
+`E.js('mod:a');`
 
-E.js('mod:a', 'mod:b', 'mod:c');
+异步加载http://baseurl/mod/a.js;
+
+`E.js('mod:a', 'mod:b', 'mod:c');`
 
 或者
 
-E.js('mod:a').js('mod:b').js('mod:c');
+`E.js('mod:a').js('mod:b').js('mod:c');`
+
+或者
+
+`E.js('mod:a');`
+`E.js('mod:b');`
+`E.js('mod:c');`
 
 
 异步并发请求a.js, b.js, c.js加载完毕之后按顺序执行;
