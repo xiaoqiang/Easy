@@ -14,17 +14,11 @@ E.js
 异步加载http://baseurl/mod/a.js;
 
 `E.js('mod:a', 'mod:b', 'mod:c');
-
 或者
-
 E.js('mod:a').js('mod:b').js('mod:c');
-
 或者
-
 E.js('mod:a');
-
 E.js('mod:b');
-
 E.js('mod:c');`
 
 
