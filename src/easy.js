@@ -1,16 +1,19 @@
 /* 
  * Easy.js
  * Version 1.0
- * http://easy.cnodejs.net/
+ * https://github.com/xiaoqiang/Easy/
  */
 ;(function(win, undefined) {
 	var doc = win.document,
+		//全局模块数组
 		assets = {},
+		//事件队列
 		handlers = {},
 		queue = [],
 		isAsync = 'async' in doc.createElement('script') || 'MozAppearance' in doc.documentElement.style || win.opera,
-		isHeadReady, nativeForEach = Array.prototype.forEach,
-		breaker = {},
+		isHeadReady,
+		//each方法摘自underscore
+		nativeForEach = Array.prototype.forEach,
 		//初始化
 		api = function(obj) {
 			if(obj instanceof api) return obj;
@@ -42,27 +45,26 @@
 			var args = arguments,
 				rest = deepSlice(args, 1),
 				next = rest[0];
-			if(!isHeadReady) {
+			if(!isHeadReady) { //等待头部准备好 just hack for some IE 
 				queue.push(function() {
 					api.load.apply(null, args);
 				});
 				return api;
 			}
-			if( !! next) {
+			if( !! next) { //预加载(cache)剩下的队列
 				each(rest, function(item) {
 					preLoad(getAsset(item));
 				});
 				load(getAsset(args[0]), function() {
 					api.load.apply(null, rest);
 				});
-			} else {
+			} else { //常规加载当前模块
 				load(getAsset(args[0]));
 			}
 			return api;
 		};
 	}
 
-	//外部调用的API
 	/* 
 	 * 外链js加载
 	 * Example
@@ -104,18 +106,18 @@
 		return {}.hasOwnProperty.call(obj, key);
 	}
 
-	function each(obj, iterator, context) {
+	function each(obj, iterator, context) { //by underscore
 		if(obj === null) return;
 		if(nativeForEach && obj.forEach === nativeForEach) {
 			obj.forEach(iterator, context);
 		} else if(obj.length === +obj.length) {
 			for(var i = 0, l = obj.length; i < l; i++) {
-				if(iterator.call(context, obj[i], i, obj) === breaker) return;
+				if(iterator.call(context, obj[i], i, obj) === {}) return;
 			}
 		} else {
 			for(var key in obj) {
 				if(has(obj, key)) {
-					if(iterator.call(context, obj[key], key, obj) === breaker) return;
+					if(iterator.call(context, obj[key], key, obj) === {}) return;
 				}
 			}
 		}
@@ -133,7 +135,7 @@
 		return item.replace(/^\s+|\s+$/g, '');
 	}
 
-	function deepSlice(arr, num) {
+	function deepSlice(arr, num) { //数组深拷贝
 		var out = [];
 		for(var i = num, len = arr.length; i < len; i++) {
 			if(isArray(arr[i])) {
@@ -145,18 +147,6 @@
 		return out;
 	}
 
-	function arrToStr(arr) {
-		var str = '';
-		each(arr, function(item) {
-			if(isArray(item)) {
-				str = '[' + arrToStr(item) + '],';
-			} else {
-				str = '"' + item + '",';
-			}
-		});
-		return str.slice(0, -1);
-	}
-
 	function one(callback) {
 		callback = callback || noop;
 		if(callback._done) {
@@ -166,15 +156,19 @@
 		callback._done = 1;
 	}
 
-	function noop() {}
+	function noop() {} //空函数
 	//功能函数
 
-	function nameToPath(item) {
-		var path = item.split(':');
-		return '/' + path[0] + '/' + path[1] + '.js';
+	function nameToPath(item) { //模块名转路径,如'mod:a.js'转成'/mod/a.js'
+		var path = item.split(':'),
+		url = '';
+		each(path, function(item, i){
+			url += '/' + item;
+		});		
+		return url + '.js';
 	}
 
-	function isAdded(item) {
+	function isAdded(item) { //模块是否已经处理
 		var tag = !1;
 		each(assets, function(_item, i) {
 			i = ' ' + i + ' ';
@@ -185,7 +179,7 @@
 		return tag;
 	}
 
-	function getAsset(item) {
+	function getAsset(item) { //根据模块名获取模块，获取不到就新建
 		if(isArray(item)) {
 			var url = COMBOURL,
 				asset,
@@ -246,14 +240,14 @@
 		}
 	}
 
-	function onPreload(asset) {
+	function onPreload(asset) { //预加载状态标记
 		asset.state = PRELOADED;
 		each(asset.onpreload, function(afterPreload) {
 			afterPreload.call();
 		});
 	}
 
-	function preLoad(asset) {
+	function preLoad(asset) { //预加载，先cache起来
 		if(asset && asset.state === undefined) {
 			asset.state = PRELOADING;
 			asset.onpreload = [];
@@ -266,7 +260,7 @@
 		}
 	}
 
-	function load(asset, callback) {
+	function load(asset, callback) { //加载状态处理
 		if(!asset) {
 			return;
 		}
@@ -296,7 +290,7 @@
 		});
 	}
 
-	function loadAsset(asset, callback) {
+	function loadAsset(asset, callback) { //加载请求
 		callback = callback || noop;
 		var ele;
 		ele = doc.createElement('script');
@@ -307,8 +301,9 @@
 		ele.async = false;
 		ele.defer = false;
 
-		function error(event) {
+		function error(event) { //错误处理
 			event = event || win.event;
+			//这里可以做错误上报
 			ele.onload = ele.onreadystatechange = ele.onerror = null;
 			callback();
 		}
@@ -323,7 +318,7 @@
 		var head = doc['head'] || doc.getElementsByTagName('head')[0];
 		head.insertBefore(ele, head.lastChild);
 	}
-	isAsync || setTimeout(function() {
+	isAsync || setTimeout(function() { //just a hack for some IE
 		isHeadReady = true;
 		each(queue, function(fn) {
 			fn();
