@@ -3,7 +3,10 @@ Easy.js
 
 无阻塞的JS模块/文件加载器
 
-初始化需要配置
+config
+===
+
+初始化只需配置
 
 	//js模块路径
 	BASEURL = '',		
@@ -12,7 +15,7 @@ Easy.js
 	//合并分隔符
 	DELIMITER = '&'
 
-`'mod:a'`只是用`':'`把路径转换成模块名
+`'mod:a'`只是用`:`把路径转换成模块名
 
 例如`'js:mod:a'`会转化成`BASEURL+'\js\mod\a.js'`
 
