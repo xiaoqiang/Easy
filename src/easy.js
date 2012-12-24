@@ -9,8 +9,11 @@
 		assets = {},
 		//事件队列
 		handlers = {},
+		//模块队列
 		queue = [],
+		//是否支持异步
 		isAsync = 'async' in doc.createElement('script') || 'MozAppearance' in doc.documentElement.style || win.opera,
+		//头部是否准备好
 		isHeadReady,
 		//each方法摘自underscore
 		nativeForEach = Array.prototype.forEach,
@@ -34,8 +37,8 @@
 	if(isAsync) { //支持异步模式
 		api.load = function() {
 			var args = arguments;
-			each(args, function(item) {
-				load(getAsset(item));
+			each(args, function(_item) {
+				load(getAsset(_item));
 
 			});
 			return api;
@@ -52,8 +55,8 @@
 				return api;
 			}
 			if( !! next) { //预加载(cache)剩下的队列
-				each(rest, function(item) {
-					preLoad(getAsset(item));
+				each(rest, function(_item) {
+					preLoad(getAsset(_item));
 				});
 				load(getAsset(args[0]), function() {
 					api.load.apply(null, rest);
@@ -86,13 +89,13 @@
 
 	api.add = function() {
 		var args = arguments;
-		each(args, function(item) {
-			item = trim(item);
-			if(isAdded(item)) {
-				assets[isAdded(item)].state = LOADED;
+		each(args, function(_item) {
+			_item = trim(_item);
+			if(isAdded(_item)) {
+				assets[isAdded(_item)].state = LOADED;
 			} else {
-				assets[item] = {
-					name: item,
+				assets[_item] = {
+					name: _item,
 					state: LOADED
 				};
 			}
@@ -100,14 +103,16 @@
 		return api;
 	};
 
-	//工具函数
+	/*
+	 * 工具函数
+	 */
 
 	function has(obj, key) {
 		return {}.hasOwnProperty.call(obj, key);
 	}
 
 	function each(obj, iterator, context) { //by underscore
-		if(obj === null) return;
+		if(obj == null) return;
 		if(nativeForEach && obj.forEach === nativeForEach) {
 			obj.forEach(iterator, context);
 		} else if(obj.length === +obj.length) {
@@ -157,13 +162,15 @@
 	}
 
 	function noop() {} //空函数
-	//功能函数
-
+	
+	/*
+	 * 功能函数
+	 */
 	function nameToPath(item) { //模块名转路径,如'mod:a.js'转成'/mod/a.js'
 		var path = item.split(':'),
 		url = '';
-		each(path, function(item, i){
-			url += '/' + item;
+		each(path, function(_item, i){
+			url += '/' + _item;
 		});		
 		return url + '.js';
 	}

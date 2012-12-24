@@ -51,5 +51,7 @@ E.add
 
 主要在内联js中用于声明mod/a.js已经加载;
 
+Qunit
+-----
 
-
+<http://easy.cnodejs.net/qunit/easy-qunit.html>
